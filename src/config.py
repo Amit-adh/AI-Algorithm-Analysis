@@ -2,7 +2,6 @@
 MODEL_NAME = 'bert-base-uncased'
 NUM_LABELS = 2  
 
--
 IMDB_DATASET_NAME = 'imdb'
 BASELINE_MODEL_PATH = './models/baseline_model'
 
