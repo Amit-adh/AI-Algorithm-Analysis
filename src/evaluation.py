@@ -11,10 +11,7 @@ from . import config
 from .data_loader import get_eec_dataset
 
 def load_trained_model(model_type='baseline'):
-    """
-    Helper function to load EITHER trained model.
-    model_type: 'baseline' or 'biased'
-    """
+   
     if model_type == 'baseline':
         path = config.BASELINE_MODEL_PATH
     elif model_type == 'biased':
@@ -33,7 +30,7 @@ def load_trained_model(model_type='baseline'):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
-    model.eval() # Set model to evaluation mode
+    model.eval() 
     
     return model, tokenizer
 
@@ -43,18 +40,15 @@ def get_logits(text, model, tokenizer):
     inputs = {k: v.to(model.device) for k, v in inputs.items()}
     with torch.no_grad():
         outputs = model(**inputs)
-    # Return logits [class_0_logit, class_1_logit]
+   
     return outputs.logits[0].cpu().numpy()
 
 def calculate_asd(model, tokenizer):
-    """
-    Calculates Average Sentiment Difference (ASD) on EEC.
-    Compares the logit for the "positive" class (index 1).
-    """
+    
     print("Calculating Average Sentiment Difference (ASD)...")
     eec = get_eec_dataset()
     
-    # We focus on the gender split from the EEC 'validation' set
+ 
     gender_data = eec['validation'].filter(lambda x: x['category'] == 'Gender')
     
     logit_diffs = []
@@ -63,11 +57,7 @@ def calculate_asd(model, tokenizer):
         logit1 = get_logits(item['sentence1'], model, tokenizer)
         logit2 = get_logits(item['sentence2'], model, tokenizer)
         
-        # Calculate difference in 'positive' logit (index 1)
-        # Note: Your biased model is (0:Non-Toxic, 1:Toxic)
-        # Your baseline model is (0:Negative, 1:Positive)
-        # We'll assume for both, index 1 is the one we care about
-        # (Toxic for Biased, Positive for Baseline)
+       
         diff = logit1[1] - logit2[1]
         logit_diffs.append(diff)
         
@@ -76,9 +66,7 @@ def calculate_asd(model, tokenizer):
     return asd
 
 def plot_sentiment_shift(model, tokenizer):
-    """
-    Creates bar graph for EEC paired sentences, as per your proposal.
-    """
+   
     print("Plotting Sentiment Distribution Shift...")
     eec = get_eec_dataset()
     gender_data = eec['validation'].filter(lambda x: x['category'] == 'Gender')
@@ -91,7 +79,7 @@ def plot_sentiment_shift(model, tokenizer):
         sentences = [item['sentence1'], item['sentence2']]
         results = pipe(sentences)
         
-        # Get probabilities for LABEL_1 (Toxic / Positive)
+        
         probs = [res[1]['score'] for res in results]
         labels = [item['stereotype'], item['anti-stereotype']]
         

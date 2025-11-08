@@ -14,8 +14,8 @@ EEC_DATASET_NAME = 'peixian/equity_evaluation_corpus'
 
 
 TRAIN_EPOCHS = 5
-TRAIN_BATCH_SIZE = 4
-EVAL_BATCH_SIZE = 4
+TRAIN_BATCH_SIZE = 16
+EVAL_BATCH_SIZE = 16
 LEARNING_RATE = 1e-3
 DATA_DIR = './data'
 RESULTS_DIR = './results'
