@@ -87,7 +87,7 @@ def train_biased_model():
         logging_dir=f"{config.RESULTS_DIR}/biased_logs",
         logging_steps=100,
         save_strategy="epoch",
-        eval_strategy="epoch",  # Compatibility with your transformers version
+        eval_strategy="epoch",  
         load_best_model_at_end=True,
         fp16=config.USE_FP16,
         gradient_accumulation_steps=config.GRADIENT_ACCUMULATION_STEPS,
@@ -105,7 +105,7 @@ def train_biased_model():
     print("Training biased model...")
     trainer.train()
 
-    # --- Save model ---
+ 
     print(f"Saving biased model to {config.BIASED_MODEL_PATH}")
     trainer.save_model(config.BIASED_MODEL_PATH)
     tokenizer.save_pretrained(config.BIASED_MODEL_PATH)

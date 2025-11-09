@@ -24,17 +24,17 @@ def train_baseline_model():
 
     model, tokenizer = get_model_and_tokenizer()
 
-    # Load IMDb dataset
+    
     dataset = get_imdb_dataset()
 
-    # --- Handle both return types (tuple or DatasetDict) ---
+    
     if isinstance(dataset, tuple):
         print("Detected tuple dataset format — converting to DatasetDict...")
         dataset = DatasetDict({"train": dataset[0], "test": dataset[1]})
     elif not isinstance(dataset, DatasetDict):
         raise TypeError("Unsupported dataset format returned from get_imdb_dataset()")
 
-    # --- Tokenize function ---
+   
     def tokenize_function(examples):
         return tokenizer(
             examples["text"],
@@ -46,7 +46,7 @@ def train_baseline_model():
     print("Tokenizing dataset...")
     tokenized_datasets = dataset.map(tokenize_function, batched=True)
 
-    # --- Subset for faster training ---
+   
     train_dataset = tokenized_datasets["train"].shuffle(seed=42).select(
         range(min(config.TRAIN_SUBSET_SIZE, len(tokenized_datasets["train"])))
     )
@@ -54,7 +54,7 @@ def train_baseline_model():
         range(min(config.VAL_SUBSET_SIZE, len(tokenized_datasets["test"])))
     )
 
-    # --- Training arguments ---
+ 
     training_args = TrainingArguments(
         output_dir=f"{config.RESULTS_DIR}/baseline_checkpoints",
         num_train_epochs=config.TRAIN_EPOCHS,
@@ -64,14 +64,14 @@ def train_baseline_model():
         logging_dir=f"{config.RESULTS_DIR}/baseline_logs",
         logging_steps=100,
         save_strategy="epoch",
-        eval_strategy="epoch",   # for older transformer versions
+        eval_strategy="epoch",  
         load_best_model_at_end=True,
         fp16=config.USE_FP16,
         gradient_accumulation_steps=config.GRADIENT_ACCUMULATION_STEPS,
         report_to="none"
     )
 
-    # --- Trainer setup ---
+    
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -82,10 +82,10 @@ def train_baseline_model():
     print("Training baseline model...")
     trainer.train()
 
-    # --- Save model ---
+    
     print(f"Saving baseline model to {config.BASELINE_MODEL_PATH}")
     trainer.save_model(config.BASELINE_MODEL_PATH)
     tokenizer.save_pretrained(config.BASELINE_MODEL_PATH)
-    print("✅ Baseline training complete.")
+    print(" Baseline training complete.")
 
     return model, tokenizer
