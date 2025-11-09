@@ -8,7 +8,7 @@ from . import config
 from .data_loader import get_jigsaw_dataframe, get_imdb_dataset, ToxicityDataset
 
 def get_model_and_tokenizer():
-   
+
     tokenizer = AutoTokenizer.from_pretrained(config.MODEL_NAME)
     model = BertForSequenceClassification.from_pretrained(
         config.MODEL_NAME,
@@ -16,27 +16,27 @@ def get_model_and_tokenizer():
     )
     return model, tokenizer
 def train_biased_model():
-   
+
     print("Starting BIASED model training process...")
     model, tokenizer = get_model_and_tokenizer()
 
-   
+
     df = get_jigsaw_dataframe()
     if df is None:
         print(" Failed to load Jigsaw data. Exiting training.")
         return None, None
 
-   
+
     from sklearn.model_selection import train_test_split
     train_texts, val_texts, train_labels, val_labels = train_test_split(
         df['comment_text'].values, df['labels'].values, test_size=0.1, random_state=42
     )
 
-    
+
     train_dataset = ToxicityDataset(train_texts, train_labels, tokenizer)
     val_dataset = ToxicityDataset(val_texts, val_labels, tokenizer)
 
-    
+
     training_args = TrainingArguments(
         output_dir=f"{config.RESULTS_DIR}/biased_checkpoints",
         num_train_epochs=config.TRAIN_EPOCHS,
@@ -72,34 +72,40 @@ def train_biased_model():
 
 
 def train_baseline_model():
-    
+
     print("Starting BASELINE model training process...")
     model, tokenizer = get_model_and_tokenizer()
 
- 
+
     train_dataset, val_dataset = get_imdb_dataset()
 
-  
+
     def tokenize_function(examples):
         return tokenizer(examples['text'], padding="max_length", truncation=True, max_length=128)
 
-    train_dataset = train_dataset.map(tokenize_function, batched=True)
-    val_dataset = val_dataset.map(tokenize_function, batched=True)
+    train_dataset = tokenized_datasets["train"].shuffle(seed=42).select(range(config.TRAIN_SUBSET_SIZE))
+    val_dataset = tokenized_datasets["test"].shuffle(seed=42).select(range(config.VAL_SUBSET_SIZE))
 
-   
-    training_args = TrainingArguments(
+
+
+    from transformers import TrainingArguments
+
+training_args = TrainingArguments(
     output_dir=f"{config.RESULTS_DIR}/baseline_checkpoints",
     num_train_epochs=config.TRAIN_EPOCHS,
     per_device_train_batch_size=config.TRAIN_BATCH_SIZE,
     per_device_eval_batch_size=config.EVAL_BATCH_SIZE,
     learning_rate=config.LEARNING_RATE,
-    save_strategy="epoch",
-    eval_strategy="epoch",             
-    load_best_model_at_end=True,        
     logging_dir=f"{config.RESULTS_DIR}/baseline_logs",
     logging_steps=100,
+    save_strategy="epoch",
+    evaluation_strategy="epoch",
+    load_best_model_at_end=True,
+    fp16=config.USE_FP16,                     # << Mixed precision training
+    gradient_accumulation_steps=config.GRADIENT_ACCUMULATION_STEPS,
     report_to="none"
 )
+
 
 
 
