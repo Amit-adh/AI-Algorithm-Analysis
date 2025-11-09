@@ -17,7 +17,7 @@ EEC_DATASET_NAME = 'peixian/equity_evaluation_corpus'
 
 # --- Training Config ---
 # Optimized for speed
-TRAIN_EPOCHS = 20              # still 10 epochs
+TRAIN_EPOCHS = 10              # still 10 epochs
 TRAIN_BATCH_SIZE = 8            # smaller batch fits better in GPU memory
 EVAL_BATCH_SIZE = 8
 LEARNING_RATE = 2e-5
