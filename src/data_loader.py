@@ -9,7 +9,7 @@ from . import config
 
 
 def download_jigsaw_data():
-  
+
     os.makedirs(config.DATA_DIR, exist_ok=True)
 
     if os.path.exists(config.JIGSAW_TRAIN_CSV):
@@ -27,14 +27,14 @@ def download_jigsaw_data():
         zip_path = f"{config.DATA_DIR}/{config.JIGSAW_COMPETITION_NAME}.zip"
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extract('train.csv', path=config.DATA_DIR)
-        os.remove(zip_path)  
+        os.remove(zip_path)
         print("Data downloaded and unzipped.")
     except Exception as e:
         print(f"Error downloading/unzipping Jigsaw data: {e}")
-        
+
 
 def get_jigsaw_dataframe():
-    
+
     try:
         df = pd.read_csv(config.JIGSAW_TRAIN_CSV)
     except FileNotFoundError:
@@ -75,17 +75,17 @@ class ToxicityDataset(Dataset):
         }
 
 
+from datasets import load_dataset
+
 def get_imdb_dataset():
-   
     print("Loading IMDb dataset...")
-    dataset = load_dataset(config.IMDB_DATASET_NAME)
+    dataset = load_dataset("imdb")
     dataset = dataset.rename_column("label", "labels")
-    train_dataset = dataset["train"]
-    val_dataset = dataset["test"]
-    return train_dataset, val_dataset
+    return dataset
+
 
 
 def get_eec_dataset():
-    
+
     print("Loading EEC dataset...")
     return load_dataset(config.EEC_DATASET_NAME, trust_remote_code=True)

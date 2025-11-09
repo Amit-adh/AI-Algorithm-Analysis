@@ -17,7 +17,7 @@ EEC_DATASET_NAME = 'peixian/equity_evaluation_corpus'
 
 # --- Training Config ---
 # Optimized for speed
-TRAIN_EPOCHS = 10               # still 10 epochs
+TRAIN_EPOCHS = 20              # still 10 epochs
 TRAIN_BATCH_SIZE = 8            # smaller batch fits better in GPU memory
 EVAL_BATCH_SIZE = 8
 LEARNING_RATE = 2e-5
@@ -25,8 +25,8 @@ MAX_SEQ_LEN = 128               # shorter sentences = faster training
 
 # --- Data Sampling ---
 # Train on a subset of IMDb to reduce time (~20% of full dataset)
-TRAIN_SUBSET_SIZE = 10000       # full is 25k, 10k is fast & still valid
-VAL_SUBSET_SIZE = 2000
+TRAIN_SUBSET_SIZE =5000       # full is 25k, 10k is fast & still valid
+VAL_SUBSET_SIZE = 1000
 
 # --- Training Optimizations ---
 USE_FP16 = True                 # Mixed precision (speeds up on CUDA)
